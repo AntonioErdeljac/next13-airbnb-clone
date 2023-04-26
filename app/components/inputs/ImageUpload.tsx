@@ -2,8 +2,8 @@
 
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import { useCallback } from "react";
 import { TbPhotoPlus } from 'react-icons/tb'
+import { useCallback } from "react";
 
 declare global {
   var cloudinary: any
@@ -33,9 +33,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       }}
     >
       {({ open }) => {
+         function handleOnClick(e) {
+          e.preventDefault()
+          open()
+        }
         return (
           <div
-            onClick={() => open?.()}
+          onClick={handleOnClick}
             className="
               relative
               cursor-pointer
