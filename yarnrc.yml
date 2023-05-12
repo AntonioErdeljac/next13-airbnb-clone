@@ -1,0 +1,5 @@
+# Enable Plug'n'Play mode
+nodeLinker: pnp
+
+# Disable automatic installation of optional dependencies
+enableTransparentWorkspaces: false
