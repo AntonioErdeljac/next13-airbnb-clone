@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url = "mongodb+srv://jessehahka:<password>@cluster01.fgxqzct.mongodb.net/?retryWrites=true&w=majority"
+  url = "mongodb+srv://jessehahka:<passwordBlessdiam369!>@cluster01.fgxqzct.mongodb.net/?retryWrites=true&w=majority"
 }
 
 model User {
