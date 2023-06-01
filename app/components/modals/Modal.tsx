@@ -83,6 +83,7 @@ const Modal: React.FC<ModalProps> = ({
           focus:outline-none
           bg-neutral-800/70
         "
+        onClick={handleClose}
       >
         <div className="
           relative 
@@ -96,6 +97,7 @@ const Modal: React.FC<ModalProps> = ({
           lg:h-auto
           md:h-auto
           "
+          onClick={(e) => e.stopPropagation()}
         >
           {/*content*/}
           <div className={`
