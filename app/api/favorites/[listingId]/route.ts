@@ -1,72 +1,72 @@
 import { NextResponse } from "next/server";
-
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
 
 interface IParams {
-  listingId?: string;
+    listingId?: string
 }
 
 export async function POST(
-  request: Request, 
-  { params }: { params: IParams }
+    request: Request,
+    { params }: { params: IParams }
 ) {
-  const currentUser = await getCurrentUser();
+    const currentUser = await getCurrentUser();
 
-  if (!currentUser) {
-    return NextResponse.error();
-  }
+    if (!currentUser) return NextResponse.error();
 
-  const { listingId } = params;
+    const { listingId } = params;
 
-  if (!listingId || typeof listingId !== 'string') {
-    throw new Error('Invalid ID');
-  }
-
-  let favoriteIds = [...(currentUser.favoriteIds || [])];
-
-  favoriteIds.push(listingId);
-
-  const user = await prisma.user.update({
-    where: {
-      id: currentUser.id
-    },
-    data: {
-      favoriteIds
+    if (!listingId) {
+        // if (!listingId || typeof listingId !== 'number') {
+        throw new Error("Invalid ID")
     }
-  });
 
-  return NextResponse.json(user);
+    // let favoutiteIDs = [...(currentUser.favoriteIds || [])];
+    let favoutiteIDs = currentUser.favoriteIds?.split(",") || [];
+    favoutiteIDs?.push(listingId);
+    const filtered = favoutiteIDs.filter(Boolean);
+
+    const user = await prisma.user.update({
+        where: {
+            id: currentUser.id
+        },
+        data: {
+            favoriteIds: filtered?.toString()
+        }
+    });
+
+    return NextResponse.json(user);
+
 }
 
+
 export async function DELETE(
-  request: Request, 
-  { params }: { params: IParams }
+    request: Request,
+    { params }: { params: IParams }
 ) {
-  const currentUser = await getCurrentUser();
+    const currentUser = await getCurrentUser();
 
-  if (!currentUser) {
-    return NextResponse.error();
-  }
+    if (!currentUser) return NextResponse.error();
 
-  const { listingId } = params;
+    const { listingId } = params;
 
-  if (!listingId || typeof listingId !== 'string') {
-    throw new Error('Invalid ID');
-  }
-
-  let favoriteIds = [...(currentUser.favoriteIds || [])];
-
-  favoriteIds = favoriteIds.filter((id) => id !== listingId);
-
-  const user = await prisma.user.update({
-    where: {
-      id: currentUser.id
-    },
-    data: {
-      favoriteIds
+    // if (!listingId || typeof listingId !== 'number') {
+    if (!listingId) {
+        throw new Error("Invalid ID")
     }
-  });
 
-  return NextResponse.json(user);
+    let favoutiteIDs = currentUser.favoriteIds?.split(",") || [];
+    favoutiteIDs = favoutiteIDs?.filter((id) => parseInt(id) != parseInt(listingId));
+    const filtered = favoutiteIDs.filter(Boolean);
+
+    const user = await prisma.user.update({
+        where: {
+            id: currentUser.id
+        },
+        data: {
+            favoriteIds: filtered?.toString()
+        }
+    });
+
+    return NextResponse.json(user);
 }
