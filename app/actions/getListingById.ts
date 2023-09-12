@@ -1,40 +1,47 @@
 import prisma from "@/app/libs/prismadb";
+import { SafeListing, SafeUser } from "../types";
+
 
 interface IParams {
-  listingId?: string;
+    listingId?: string
 }
 
-export default async function getListingById(
-  params: IParams
-) {
-  try {
-    const { listingId } = params;
+export default async function getListingById(params: IParams) {
+    try {
+        const { listingId } = params;
 
-    const listing = await prisma.listing.findUnique({
-      where: {
-        id: listingId,
-      },
-      include: {
-        user: true
-      }
-    });
+        let listingIdVal: number = parseInt(listingId!);
 
-    if (!listing) {
-      return null;
+        // console.log(`listingId is ${listingId} (${typeof listingId}) and listingIdVal is ${listingIdVal} (${typeof listingIdVal})`);
+
+        const listing = await prisma.listing.findUnique({
+            where: {
+                id: listingIdVal
+            },
+            include: {
+                user: true
+            }
+        });
+
+        // console.log(listingId, listing);
+
+        if (!listing) return null;
+
+        // return listing;
+
+        return {
+            ...listing,
+            createdAt: listing.createdAt.toISOString(),
+            user: {
+                ...listing.user,
+                createdAt: listing.user.createdAt.toISOString(),
+                updatedAt: listing.user.createdAt.toISOString(),
+                emailVerified: listing.user.emailVerified?.toISOString()!,
+            }
+        }
+
+
+    } catch (err: any) {
+        throw new Error(err);
     }
-
-    return {
-      ...listing,
-      createdAt: listing.createdAt.toString(),
-      user: {
-        ...listing.user,
-        createdAt: listing.user.createdAt.toString(),
-        updatedAt: listing.user.updatedAt.toString(),
-        emailVerified: 
-          listing.user.emailVerified?.toString() || null,
-      }
-    };
-  } catch (error: any) {
-    throw new Error(error);
-  }
 }

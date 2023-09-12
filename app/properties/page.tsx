@@ -1,43 +1,38 @@
-
-import EmptyState from "@/app/components/EmptyState";
-import ClientOnly from "@/app/components/ClientOnly";
-
-import getCurrentUser from "@/app/actions/getCurrentUser";
-import getListings from "@/app/actions/getListings";
-
+import EmptyState from "../components/EmptyState";
+// import ClientOnly from "../components/ClientOnly";
+import getCurrentUser from "../actions/getCurrentUser";
 import PropertiesClient from "./PropertiesClient";
+import getListings from "../actions/getListings";
 
 const PropertiesPage = async () => {
-  const currentUser = await getCurrentUser();
+    const currentUser = await getCurrentUser();
 
-  if (!currentUser) {
-    return <EmptyState
-      title="Unauthorized"
-      subtitle="Please login"
-    />
-  }
+    if (!currentUser) {
+        return (
+            // <ClientOnly>
+            <EmptyState title="Unauthorized" subtitle="Please login" />
+            // </ClientOnly>
+        )
+    }
 
-  const listings = await getListings({ userId: currentUser.id });
+    const listings = await getListings({ userId: currentUser.id });
 
-  if (listings.length === 0) {
+    if (listings.length === 0) {
+        return (
+            // <ClientOnly>
+            <EmptyState title="No properties found" subtitle="Looks like you have no properties" />
+            // </ClientOnly>
+        )
+    }
+
     return (
-      <ClientOnly>
-        <EmptyState
-          title="No properties found"
-          subtitle="Looks like you have no properties."
-        />
-      </ClientOnly>
-    );
-  }
+        // <ClientOnly>
+        // <TripsClient currentUser={currentUser} />
+        <PropertiesClient listings={listings} currentUser={currentUser} />
+        // </ClientOnly>
+    )
 
-  return (
-    <ClientOnly>
-      <PropertiesClient
-        listings={listings}
-        currentUser={currentUser}
-      />
-    </ClientOnly>
-  );
+
 }
- 
+
 export default PropertiesPage;
