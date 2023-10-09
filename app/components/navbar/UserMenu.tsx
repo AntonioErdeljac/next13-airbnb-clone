@@ -6,7 +6,6 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import useLoginModal from "@/app/hooks/useLoginModal";
-import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useRentModal from "@/app/hooks/useRentModal";
 import { SafeUser } from "@/app/types";
 
@@ -23,7 +22,6 @@ const UserMenu: React.FC<UserMenuProps> = ({
   const router = useRouter();
 
   const loginModal = useLoginModal();
-  const registerModal = useRegisterModal();
   const rentModal = useRentModal();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -133,10 +131,6 @@ const UserMenu: React.FC<UserMenuProps> = ({
                 <MenuItem 
                   label="Login" 
                   onClick={loginModal.onOpen}
-                />
-                <MenuItem 
-                  label="Sign up" 
-                  onClick={registerModal.onOpen}
                 />
               </>
             )}
