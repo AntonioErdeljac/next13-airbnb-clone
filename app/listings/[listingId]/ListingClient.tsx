@@ -11,7 +11,7 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 import { SafeListing, SafeReservation, SafeUser } from "@/app/types";
 
 import Container from "@/app/components/Container";
-import { categories } from "@/app/components/navbar/Categories";
+import { allCategories } from "@/app/components/navbar/Categories";
 import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
 import ListingReservation from "@/app/components/listings/ListingReservation";
@@ -53,13 +53,12 @@ const ListingClient: React.FC<ListingClientProps> = ({
     return dates;
   }, [reservations]);
 
-  const category = useMemo(() => {
-     return categories.find((items) => 
-      items.label === listing.category);
-  }, [listing.category]);
+  const categories = useMemo(() => {
+     return allCategories.filter((items) => 
+      listing.categories.includes(items.label) );
+  }, [listing.categories]);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [totalPrice, setTotalPrice] = useState(listing.price);
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
 
   const onCreateReservation = useCallback(() => {
@@ -69,46 +68,29 @@ const ListingClient: React.FC<ListingClientProps> = ({
       setIsLoading(true);
 
       axios.post('/api/reservations', {
-        totalPrice,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
         listingId: listing?.id
       })
       .then(() => {
-        toast.success('Listing reserved!');
+        toast.success('ההזמנה נקלטה!');
         setDateRange(initialDateRange);
         router.push('/trips');
       })
       .catch(() => {
-        toast.error('Something went wrong.');
+        toast.error('משהו השתבש.');
       })
       .finally(() => {
         setIsLoading(false);
       })
   },
   [
-    totalPrice, 
     dateRange, 
     listing?.id,
     router,
     currentUser,
     loginModal
   ]);
-
-  useEffect(() => {
-    if (dateRange.startDate && dateRange.endDate) {
-      const dayCount = differenceInDays(
-        dateRange.endDate, 
-        dateRange.startDate
-      );
-      
-      if (dayCount && listing.price) {
-        setTotalPrice(dayCount * listing.price);
-      } else {
-        setTotalPrice(listing.price);
-      }
-    }
-  }, [dateRange, listing.price]);
 
   return ( 
     <Container>
@@ -121,12 +103,11 @@ const ListingClient: React.FC<ListingClientProps> = ({
         <div className="flex flex-col gap-6">
           <ListingHead
             title={listing.title}
-            imageSrc={listing.imageSrc}
             locationValue={listing.locationValue}
             id={listing.id}
             currentUser={currentUser}
           />
-          <div 
+          {!!currentUser ? <div 
             className="
               grid 
               grid-cols-1 
@@ -137,7 +118,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
           >
             <ListingInfo
               user={listing.user}
-              category={category}
+              categories={categories}
               description={listing.description}
               roomCount={listing.roomCount}
               guestCount={listing.guestCount}
@@ -153,8 +134,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
               "
             >
               <ListingReservation
-                price={listing.price}
-                totalPrice={totalPrice}
                 onChangeDate={(value) => setDateRange(value)}
                 dateRange={dateRange}
                 onSubmit={onCreateReservation}
@@ -162,7 +141,9 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 disabledDates={disabledDates}
               />
             </div>
-          </div>
+          </div> : <div>
+            על מנת להגן על פרטיותכם עליכם להתחבר באמצעות חשבון gmail תקין למערכת
+            </div>}
         </div>
       </div>
     </Container>

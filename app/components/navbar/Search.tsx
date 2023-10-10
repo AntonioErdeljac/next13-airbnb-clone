@@ -6,12 +6,12 @@ import { BiSearch } from 'react-icons/bi';
 import { differenceInDays } from 'date-fns';
 
 import useSearchModal from '@/app/hooks/useSearchModal';
-import useCountries from '@/app/hooks/useCountries';
+import useBureaus from '@/app/hooks/useBureaus';
 
 const Search = () => {
   const searchModal = useSearchModal();
   const params = useSearchParams();
-  const { getByValue } = useCountries();
+  const { getByValue } = useBureaus();
 
   const  locationValue = params?.get('locationValue'); 
   const  startDate = params?.get('startDate');
@@ -23,7 +23,7 @@ const Search = () => {
       return getByValue(locationValue as string)?.label;
     }
 
-    return 'Anywhere';
+    return 'כל האזורים';
   }, [locationValue, getByValue]);
 
   const durationLabel = useMemo(() => {
@@ -36,18 +36,18 @@ const Search = () => {
         diff = 1;
       }
 
-      return `${diff} Days`;
+      return `ימים ${diff}`;
     }
 
-    return 'Any Week'
+    return 'מה שזמין'
   }, [startDate, endDate]);
 
   const guestLabel = useMemo(() => {
     if (guestCount) {
-      return `${guestCount} Guests`;
+      return `${guestCount} אורחים`;
     }
 
-    return 'Add Guests';
+    return 'הוספת אורחים';
   }, [guestCount]);
 
   return ( 

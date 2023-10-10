@@ -2,7 +2,6 @@ import { Nunito } from 'next/font/google'
 
 import Navbar from '@/app/components/navbar/Navbar';
 import LoginModal from '@/app/components/modals/LoginModal';
-import RegisterModal from '@/app/components/modals/RegisterModal';
 import SearchModal from '@/app/components/modals/SearchModal';
 import RentModal from '@/app/components/modals/RentModal';
 
@@ -13,8 +12,8 @@ import ClientOnly from './components/ClientOnly';
 import getCurrentUser from './actions/getCurrentUser';
 
 export const metadata = {
-  title: 'Airbnb',
-  description: 'Airbnb Clone',
+  title: 'Warbnb',
+  description: 'אירוח לתושבי הדרום',
 }
 
 const font = Nunito({ 
@@ -29,12 +28,11 @@ export default async function RootLayout({
   const currentUser = await getCurrentUser();
 
   return (
-    <html lang="en">
+    <html lang="en" dir="rtl">
       <body className={font.className}>
         <ClientOnly>
           <ToasterProvider />
           <LoginModal />
-          <RegisterModal />
           <SearchModal />
           <RentModal />
           <Navbar currentUser={currentUser} />

@@ -1,6 +1,6 @@
 'use client';
 
-import qs from 'query-string';
+import qs, { ParsedQuery } from 'query-string';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { IconType } from "react-icons";
@@ -9,6 +9,16 @@ interface CategoryBoxProps {
   icon: IconType,
   label: string;
   selected?: boolean;
+}
+// NOTE: This mutates the filters[] parameter! 
+export const toggleCategoryFilter = (filters: string[], category: string): string[] => {
+  const index = filters.indexOf(category, 0);
+  if (index > -1) {
+    filters.splice(index, 1);
+  } else {
+    filters.push(category);
+  }
+  return filters;
 }
 
 const CategoryBox: React.FC<CategoryBoxProps> = ({
@@ -20,21 +30,19 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
   const params = useSearchParams();
 
   const handleClick = useCallback(() => {
-    let currentQuery = {};
+    let currentQuery: ParsedQuery<string> = {};
     
     if (params) {
       currentQuery = qs.parse(params.toString())
     }
-
+    const cats = params?.getAll("categories") || [];
+    const catArray = Array.isArray(cats) ? cats : [ cats ];
+    const safeCats: string[] = catArray.map(v => v === null ? "" : v).filter(v => v !== "");
     const updatedQuery: any = {
       ...currentQuery,
-      category: label
+      categories: toggleCategoryFilter(safeCats, label)
     }
-
-    if (params?.get('category') === label) {
-      delete updatedQuery.category;
-    }
-
+   
     const url = qs.stringifyUrl({
       url: '/',
       query: updatedQuery

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { IconType } from "react-icons";
 
-import useCountries from "@/app/hooks/useCountries";
+import useBureaus from "@/app/hooks/useBureaus";
 import { SafeUser } from "@/app/types";
 
 import Avatar from "../Avatar";
@@ -13,17 +13,19 @@ const Map = dynamic(() => import('../Map'), {
   ssr: false 
 });
 
+type Category = {
+  icon: IconType,
+  label: string;
+  description: string;
+}
+
 interface ListingInfoProps {
   user: SafeUser,
   description: string;
   guestCount: number;
   roomCount: number;
   bathroomCount: number;
-  category: {
-    icon: IconType,
-    label: string;
-    description: string;
-  } | undefined
+  categories: Category[];
   locationValue: string;
 }
 
@@ -33,10 +35,10 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   guestCount,
   roomCount,
   bathroomCount,
-  category,
+  categories,
   locationValue,
 }) => {
-  const { getByValue } = useCountries();
+  const { getByValue } = useBureaus();
 
   const coordinates = getByValue(locationValue)?.latlng
 
@@ -53,7 +55,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
             gap-2
           "
         >
-          <div>Hosted by {user?.name}</div>
+          <div>להתארח אצל {user?.name}</div>
           <Avatar src={user?.image} />
         </div>
         <div className="
@@ -66,27 +68,30 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
           "
         >
           <div>
-            {guestCount} guests
+            {guestCount} נפשות / Guests
           </div>
           <div>
-            {roomCount} rooms
+            {roomCount} חדרים / Bedrooms
           </div>
           <div>
-            {bathroomCount} bathrooms
+            {bathroomCount} חדרי רחצה / Bathrooms
           </div>
         </div>
       </div>
       <hr />
-      {category && (
-        <ListingCategory
-          icon={category.icon} 
-          label={category?.label}
-          description={category?.description} 
-        />
-      )}
+      <div className="grid grid-cols-3 gap-4">
+        {categories && categories.map((category) => (
+          <ListingCategory
+            key={category.label}
+            icon={category.icon} 
+            label={category?.label}
+            description={category?.description} 
+          />
+        ))}
+      </div>
       <hr />
       <div className="
-      text-lg font-light text-neutral-500">
+      text-lg font-light text-neutral-500 break-words">
         {description}
       </div>
       <hr />
