@@ -21,4 +21,6 @@ export type SafeUser = Omit<
   createdAt: string;
   updatedAt: string;
   emailVerified: string | null;
+} & {
+  isHost?: boolean;
 };

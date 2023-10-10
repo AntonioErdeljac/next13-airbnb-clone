@@ -7,6 +7,9 @@ interface IParams {
   reservationId?: string;
 }
 
+// user cancel reservation
+// +
+// host cancel reservation
 export async function DELETE(
   request: Request, 
   { params }: { params: IParams }

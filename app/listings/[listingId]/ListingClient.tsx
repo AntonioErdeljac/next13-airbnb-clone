@@ -75,12 +75,12 @@ const ListingClient: React.FC<ListingClientProps> = ({
         listingId: listing?.id
       })
       .then(() => {
-        toast.success('Listing reserved!');
+        toast.success('ההזמנה נקלטה!');
         setDateRange(initialDateRange);
         router.push('/trips');
       })
       .catch(() => {
-        toast.error('Something went wrong.');
+        toast.error('משהו השתבש.');
       })
       .finally(() => {
         setIsLoading(false);
@@ -121,12 +121,11 @@ const ListingClient: React.FC<ListingClientProps> = ({
         <div className="flex flex-col gap-6">
           <ListingHead
             title={listing.title}
-            imageSrc={listing.imageSrc}
             locationValue={listing.locationValue}
             id={listing.id}
             currentUser={currentUser}
           />
-          <div 
+          {!!currentUser ? <div 
             className="
               grid 
               grid-cols-1 
@@ -153,8 +152,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
               "
             >
               <ListingReservation
-                price={listing.price}
-                totalPrice={totalPrice}
                 onChangeDate={(value) => setDateRange(value)}
                 dateRange={dateRange}
                 onSubmit={onCreateReservation}
@@ -162,7 +159,9 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 disabledDates={disabledDates}
               />
             </div>
-          </div>
+          </div> : <div>
+            על מנת להגן על פרטיותכם עליכם להתחבר באמצעות חשבון gmail תקין למערכת
+            </div>}
         </div>
       </div>
     </Container>

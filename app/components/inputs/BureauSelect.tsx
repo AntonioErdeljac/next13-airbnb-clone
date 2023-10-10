@@ -2,42 +2,40 @@
 
 import Select from 'react-select'
 
-import useCountries from '@/app/hooks/useCountries';
+import useBureaus from '@/app/hooks/useBureaus';
 
-export type CountrySelectValue = {
-  flag: string;
+export type BureauSelectValue = {
   label: string;
   latlng: number[],
   region: string;
   value: string
 }
 
-interface CountrySelectProps {
-  value?: CountrySelectValue;
-  onChange: (value: CountrySelectValue) => void;
+interface BureauSelectProps {
+  value?: BureauSelectValue;
+  onChange: (value: BureauSelectValue) => void;
 }
 
-const CountrySelect: React.FC<CountrySelectProps> = ({
+const BureauSelect: React.FC<BureauSelectProps> = ({
   value,
   onChange
 }) => {
-  const { getAll } = useCountries();
+  const { getAll } = useBureaus();
 
   return ( 
     <div>
       <Select
-        placeholder="Anywhere"
+        placeholder="בחירה..."
         isClearable
         options={getAll()}
         value={value}
-        onChange={(value) => onChange(value as CountrySelectValue)}
+        onChange={(value) => onChange(value as BureauSelectValue)}
         formatOptionLabel={(option: any) => (
           <div className="
           flex flex-row items-center gap-3">
-            <div>{option.flag}</div>
             <div>
-              {option.label},
-              <span className="text-neutral-500 ml-1">
+              {option.label}, 
+              <span className="text-neutral-500 mr-1">
                 {option.region}
               </span>
             </div>
@@ -62,4 +60,4 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
    );
 }
  
-export default CountrySelect;
+export default BureauSelect;

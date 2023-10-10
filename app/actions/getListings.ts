@@ -1,4 +1,7 @@
 import prisma from "@/app/libs/prismadb";
+import pick from "lodash.pick";
+import { Listing } from "@prisma/client";
+import getCurrentUser from "./getCurrentUser";
 
 export interface IListingsParams {
   userId?: string;
@@ -11,15 +14,21 @@ export interface IListingsParams {
   category?: string;
 }
 
-export default async function getListings(
-  params: IListingsParams
-) {
+const publicKeys: Array<keyof Listing> = [
+  "title",
+  "roomCount",
+  "guestCount",
+  "category",
+  "id",
+];
+
+export default async function getListings(params: IListingsParams) {
   try {
     const {
       userId,
-      roomCount, 
-      guestCount, 
-      bathroomCount, 
+      roomCount,
+      guestCount,
+      bathroomCount,
       locationValue,
       startDate,
       endDate,
@@ -38,20 +47,20 @@ export default async function getListings(
 
     if (roomCount) {
       query.roomCount = {
-        gte: +roomCount
-      }
+        gte: +roomCount,
+      };
     }
 
     if (guestCount) {
       query.guestCount = {
-        gte: +guestCount
-      }
+        gte: +guestCount,
+      };
     }
 
     if (bathroomCount) {
       query.bathroomCount = {
-        gte: +bathroomCount
-      }
+        gte: +bathroomCount,
+      };
     }
 
     if (locationValue) {
@@ -65,29 +74,38 @@ export default async function getListings(
             OR: [
               {
                 endDate: { gte: startDate },
-                startDate: { lte: startDate }
+                startDate: { lte: startDate },
               },
               {
                 startDate: { lte: endDate },
-                endDate: { gte: endDate }
-              }
-            ]
-          }
-        }
-      }
+                endDate: { gte: endDate },
+              },
+            ],
+          },
+        },
+      };
     }
 
-    const listings = await prisma.listing.findMany({
+    const listings = (await prisma.listing.findMany({
       where: query,
       orderBy: {
-        createdAt: 'desc'
-      }
-    });
+        createdAt: "desc",
+      },
+    })) as Array<Listing>;
 
-    const safeListings = listings.map((listing) => ({
-      ...listing,
-      createdAt: listing.createdAt.toISOString(),
-    }));
+    const hasSession = !!(await getCurrentUser());
+
+    const safeListings = listings.map((listing) =>
+      hasSession
+        ? {
+            ...listing,
+            createdAt: listing.createdAt.toISOString(),
+          }
+        : {
+            ...pick(listing, publicKeys),
+            createdAt: listing.createdAt.toISOString(),
+          }
+    );
 
     return safeListings;
   } catch (error: any) {

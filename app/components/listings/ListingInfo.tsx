@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { IconType } from "react-icons";
 
-import useCountries from "@/app/hooks/useCountries";
+import useBureaus from "@/app/hooks/useBureaus";
 import { SafeUser } from "@/app/types";
 
 import Avatar from "../Avatar";
@@ -36,7 +36,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   category,
   locationValue,
 }) => {
-  const { getByValue } = useCountries();
+  const { getByValue } = useBureaus();
 
   const coordinates = getByValue(locationValue)?.latlng
 
@@ -53,7 +53,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
             gap-2
           "
         >
-          <div>Hosted by {user?.name}</div>
+          <div>להתארח אצל {user?.name}</div>
           <Avatar src={user?.image} />
         </div>
         <div className="
@@ -66,13 +66,13 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
           "
         >
           <div>
-            {guestCount} guests
+            {guestCount} נפשות
           </div>
           <div>
-            {roomCount} rooms
+            {roomCount} חדרים
           </div>
           <div>
-            {bathroomCount} bathrooms
+            {bathroomCount} חדרי רחצה
           </div>
         </div>
       </div>
@@ -86,7 +86,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
       )}
       <hr />
       <div className="
-      text-lg font-light text-neutral-500">
+      text-lg font-light text-neutral-500 break-words">
         {description}
       </div>
       <hr />

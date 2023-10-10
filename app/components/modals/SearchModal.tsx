@@ -12,9 +12,9 @@ import useSearchModal from "@/app/hooks/useSearchModal";
 import Modal from "./Modal";
 import Calendar from "../inputs/Calendar";
 import Counter from "../inputs/Counter";
-import CountrySelect, { 
-  CountrySelectValue
-} from "../inputs/CountrySelect";
+import BureauSelect, { 
+  BureauSelectValue
+} from "../inputs/BureauSelect";
 import Heading from '../Heading';
 
 enum STEPS {
@@ -30,7 +30,7 @@ const SearchModal = () => {
 
   const [step, setStep] = useState(STEPS.LOCATION);
 
-  const [location, setLocation] = useState<CountrySelectValue>();
+  const [location, setLocation] = useState<BureauSelectValue>();
   const [guestCount, setGuestCount] = useState(1);
   const [roomCount, setRoomCount] = useState(1);
   const [bathroomCount, setBathroomCount] = useState(1);
@@ -103,10 +103,10 @@ const SearchModal = () => {
 
   const actionLabel = useMemo(() => {
     if (step === STEPS.INFO) {
-      return 'Search'
+      return 'חיפוש'
     }
 
-    return 'Next'
+    return 'הבא'
   }, [step]);
 
   const secondaryActionLabel = useMemo(() => {
@@ -114,19 +114,19 @@ const SearchModal = () => {
       return undefined
     }
 
-    return 'Back'
+    return 'חזרה'
   }, [step]);
 
   let bodyContent = (
     <div className="flex flex-col gap-8">
       <Heading
-        title="Where do you wanna go?"
-        subtitle="Find the perfect location!"
+        title="מיקום מועדף?"
+        subtitle=""
       />
-      <CountrySelect 
+      <BureauSelect 
         value={location} 
         onChange={(value) => 
-          setLocation(value as CountrySelectValue)} 
+          setLocation(value as BureauSelectValue)} 
       />
       <hr />
       <Map center={location?.latlng} />
@@ -137,8 +137,8 @@ const SearchModal = () => {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="When do you plan to go?"
-          subtitle="Make sure everyone is free!"
+          title="תאריכי יעד"
+          subtitle="למציאת מקומות פנויים"
         />
         <Calendar
           onChange={(value) => setDateRange(value.selection)}
@@ -152,21 +152,21 @@ const SearchModal = () => {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="More information"
-          subtitle="Find your perfect place!"
+          title="צרכים נוספים"
+          subtitle=""
         />
         <Counter 
           onChange={(value) => setGuestCount(value)}
           value={guestCount}
-          title="Guests" 
-          subtitle="How many guests are coming?"
+          title="מספר נפשות" 
+          subtitle=""
         />
         <hr />
         <Counter 
           onChange={(value) => setRoomCount(value)}
           value={roomCount}
-          title="Rooms" 
-          subtitle="How many rooms do you need?"
+          title="חדרים" 
+          subtitle="כמה חדרים נחוצים?"
         />        
         <hr />
         <Counter 
@@ -174,8 +174,8 @@ const SearchModal = () => {
             setBathroomCount(value)
           }}
           value={bathroomCount}
-          title="Bathrooms"
-          subtitle="How many bahtrooms do you need?"
+          title="חדרי רחצה"
+          subtitle="כמה חדרי רחצה  שונים נחוצים"
         />
       </div>
     )
@@ -184,7 +184,7 @@ const SearchModal = () => {
   return (
     <Modal
       isOpen={searchModal.isOpen}
-      title="Filters"
+      title="חיפוש"
       actionLabel={actionLabel}
       onSubmit={onSubmit}
       secondaryActionLabel={secondaryActionLabel}

@@ -7,10 +7,12 @@ interface IParams {
   listingId?: string;
 }
 
+// host delete listing
 export async function DELETE(
   request: Request, 
   { params }: { params: IParams }
 ) {
+  // ensure valid host session
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
