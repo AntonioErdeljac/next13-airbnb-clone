@@ -1,29 +1,42 @@
 import prisma from "@/app/libs/prismadb";
+import pick from "lodash.pick";
+import { Listing } from "@prisma/client";
+import getCurrentUser from "./getCurrentUser";
+import { SafeListing } from "../types";
 
 export interface IListingsParams {
   userId?: string;
+  includeUnavailable?: boolean;
   guestCount?: number;
   roomCount?: number;
   bathroomCount?: number;
   startDate?: string;
   endDate?: string;
   locationValue?: string;
-  category?: string;
+  categories?: string[];
+  phoneNumber?: string;
 }
 
-export default async function getListings(
-  params: IListingsParams
-) {
+const publicKeys: Array<keyof Listing> = [
+  "title",
+  "roomCount",
+  "guestCount",
+  "locationValue",
+  "categories",
+  "id",
+];
+
+export default async function getListings(params: IListingsParams): Promise<SafeListing[]> {
   try {
     const {
       userId,
-      roomCount, 
-      guestCount, 
-      bathroomCount, 
+      roomCount,
+      guestCount,
+      bathroomCount,
       locationValue,
       startDate,
       endDate,
-      category,
+      categories,
     } = params;
 
     let query: any = {};
@@ -32,62 +45,77 @@ export default async function getListings(
       query.userId = userId;
     }
 
-    if (category) {
-      query.category = category;
+    if (categories) {
+      query.categories = {
+        hasEvery: categories
+      }
     }
 
     if (roomCount) {
       query.roomCount = {
-        gte: +roomCount
-      }
+        gte: +roomCount,
+      };
     }
 
     if (guestCount) {
       query.guestCount = {
-        gte: +guestCount
-      }
+        gte: +guestCount,
+      };
     }
 
     if (bathroomCount) {
       query.bathroomCount = {
-        gte: +bathroomCount
-      }
+        gte: +bathroomCount,
+      };
     }
 
     if (locationValue) {
       query.locationValue = locationValue;
     }
 
-    if (startDate && endDate) {
-      query.NOT = {
-        reservations: {
-          some: {
-            OR: [
-              {
-                endDate: { gte: startDate },
-                startDate: { lte: startDate }
-              },
-              {
-                startDate: { lte: endDate },
-                endDate: { gte: endDate }
-              }
-            ]
-          }
-        }
-      }
+    if (!params.includeUnavailable) {
+      query.available = true;
     }
 
-    const listings = await prisma.listing.findMany({
+    // if (startDate && endDate) {
+    //   query.NOT = {
+    //     reservations: {
+    //       some: {
+    //         OR: [
+    //           {
+    //             endDate: { gte: startDate },
+    //             startDate: { lte: startDate },
+    //           },
+    //           {
+    //             startDate: { lte: endDate },
+    //             endDate: { gte: endDate },
+    //           },
+    //         ],
+    //       },
+    //     },
+    //   };
+    // }
+
+    const listings = (await prisma.listing.findMany({
       where: query,
       orderBy: {
-        createdAt: 'desc'
-      }
-    });
+        createdAt: "desc",
+      },
+    })) as Array<Listing>;
 
-    const safeListings = listings.map((listing) => ({
-      ...listing,
-      createdAt: listing.createdAt.toISOString(),
-    }));
+    const hasSession = !!(await getCurrentUser());
+
+    const safeListings = listings.map((listing) =>
+      hasSession
+        ? {
+            ...listing,
+            createdAt: listing.createdAt.toISOString(),
+          }
+        : {
+            ...pick(listing, publicKeys),
+            createdAt: listing.createdAt.toISOString(),
+          }
+    );
 
     return safeListings;
   } catch (error: any) {
